@@ -90,7 +90,6 @@ app.get("/assign", async (req, res) => {
 app.post("/assign", async (req, res) => {
     if (!res.locals.authenticated) return res.redirect("/");
     const { memberName, round, points } = req.body;
-    console.log(req.body);
     const member = await Member.findOne({ name: memberName });
 
     if (member && ["1", "2", "3"].includes(round)) {
@@ -100,6 +99,34 @@ app.post("/assign", async (req, res) => {
 
     res.redirect("/leaderboard");
 });
+
+// Add User Page
+app.get("/adduser", (req, res) => {
+    if (!res.locals.authenticated) return res.redirect("/");
+    res.render("createuser", { error: null });
+});
+
+app.post("/adduser", async (req, res) => {
+    if (!res.locals.authenticated) return res.redirect("/");
+
+    const { name } = req.body;
+
+    try {
+        // check if user already exists
+        const exists = await Member.findOne({ name });
+        if (exists) {
+            return res.render("createuser", { error: "User already exists" });
+        }
+
+        // create user with 0 points
+        await Member.create({ name });
+        return res.redirect("/leaderboard");
+    } catch (err) {
+        console.error(err);
+        return res.render("createuser", { error: "Something went wrong" });
+    }
+});
+
 
 // Seed sample members (optional)
 app.get("/seed", async (req, res) => {
