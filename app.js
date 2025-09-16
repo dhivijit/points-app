@@ -39,7 +39,6 @@ app.use((req, res, next) => {
 // Routes
 // Leaderboard
 app.get("/leaderboard", async (req, res) => {
-    if (!res.locals.authenticated) return res.redirect("/");
 
     const round = req.query.round; // round filter
     let members = await Member.find({});
